@@ -5,9 +5,10 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public List<GameObject> listaDePrefabs;
-    private List<GameObject> matados;
-    private bool hasPerdido;
-    private bool hasGanado;
+    public List<string> matados = new List<string>();
+    public bool hasPerdido;
+    public bool hasGanado;
+    public TMPro.TextMeshProUGUI WonLostLabel;
 
     // Start is called before the first frame update
     void Start()
@@ -18,16 +19,26 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (hasPerdido || hasGanado)
+        {
+            Time.timeScale = 0;
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                UnityEditor.EditorApplication.isPlaying = false;
+            }
+        }
         if (hasPerdido)
         {
-            Debug.Log("HAS PERDIDO");
+            WonLostLabel.text = "HAS PERDIDO";
         }else if (hasGanado)
         {
-            Debug.Log("HAS GANADO");
+            WonLostLabel.text = "HAS GANADO";
         }
+
+        
     }
 
-    void Matar(GameObject objeto)
+    public void Matar(GameObject objeto)
     {
         if ( Contiene(objeto, matados) )
         {
@@ -35,7 +46,7 @@ public class GameManager : MonoBehaviour
         }
         else 
         {
-            matados.Add(objeto);
+            matados.Add(objeto.name);
             if (matados.Count == listaDePrefabs.Count)
             {
                 hasGanado = true;
@@ -43,15 +54,20 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    bool Contiene(GameObject objeto, List<GameObject> lista)
+    bool Contiene(GameObject objeto, List<string> lista)
     {
         for (int i = 0; i < lista.Count; i++)
         {
-            if (objeto == lista[i])
+            if (objeto.name == lista[i])
             {
                 return true;
             }
         }
         return false;
+    }
+
+    public bool IsValidOutOfBounds(GameObject objeto)
+    {
+        return Contiene(objeto, matados);
     }
 }
